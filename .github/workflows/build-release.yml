@@ -1,0 +1,135 @@
+name: Build (Release)
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to build (e.g., mc26.1-v0.1.0) - will produce 0.1.0+mc26.1 version"
+        required: true
+        type: string
+      publish:
+        description: "Actually publish (otherwise build only)"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.loader == 'neoforge' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        loader: [fabric, neoforge]
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+
+      - name: Extract version information
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            TAG="${{ inputs.tag }}"
+          else
+            TAG="${{ github.event.release.tag_name }}"
+          fi
+
+          # Tag format: mc26.1-v0.1.0
+          if [[ "$TAG" =~ ^mc([0-9.]+)-v(.+)$ ]]; then
+            MC_COMPONENT="${BASH_REMATCH[1]}"
+            VERSION="${BASH_REMATCH[2]}"
+          else
+            echo "Warning: Tag didn't match expected format: $TAG"
+            VERSION="${TAG#v}"
+            MC_COMPONENT="unknown"
+          fi
+
+          VERSION="${VERSION#v}"
+
+          MC_VERSION="$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2)"
+          LOADER="${{ matrix.loader }}"
+
+          FULL_VERSION="${VERSION}+mc${MC_VERSION}.${LOADER}"
+
+          GRADLE_TASK=":${LOADER}:jar"
+
+          if [[ "$MC_VERSION" =~ (snapshot|alpha|beta) ]]; then
+            VERSION_TYPE="beta"
+            GAME_VERSION_FILTER="none"
+            MODRINTH_FEATURED="false"
+          else
+            VERSION_TYPE="release"
+            GAME_VERSION_FILTER="releases"
+            MODRINTH_FEATURED="true"
+          fi
+
+          MODRINTH_VERSION="${FULL_VERSION}"
+          if (( ${#MODRINTH_VERSION} > 32 )); then
+            MODRINTH_VERSION="${MODRINTH_VERSION:0:32}"
+          fi
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "modrinth_version=$MODRINTH_VERSION" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "full_version=$FULL_VERSION" >> "$GITHUB_OUTPUT"
+          echo "minecraft_version=$MC_VERSION" >> "$GITHUB_OUTPUT"
+          echo "loader=$LOADER" >> "$GITHUB_OUTPUT"
+          echo "gradle_task=$GRADLE_TASK" >> "$GITHUB_OUTPUT"
+          echo "version_type=$VERSION_TYPE" >> "$GITHUB_OUTPUT"
+          echo "game_version_filter=$GAME_VERSION_FILTER" >> "$GITHUB_OUTPUT"
+          echo "modrinth_featured=$MODRINTH_FEATURED" >> "$GITHUB_OUTPUT"
+
+          echo "Tag: $TAG | Version: $FULL_VERSION | MC: $MC_VERSION | Loader: $LOADER"
+
+      - name: Build with Gradle
+        run: ./gradlew ${{ steps.version.outputs.gradle_task }} --console=plain
+        env:
+          MOD_VERSION: ${{ steps.version.outputs.full_version }}
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v7
+        with:
+          name: template-${{ matrix.loader }}-${{ steps.version.outputs.full_version }}
+          path: ${{ matrix.loader }}/build/libs/template-*.jar
+
+      - name: Publish to Modrinth and CurseForge
+        # NeoForge publishing deferred until stable
+        if: (github.event_name != 'workflow_dispatch' || inputs.publish) && matrix.loader == 'fabric'
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-featured: ${{ steps.version.outputs.modrinth_featured }}
+          modrinth-version: ${{ steps.version.outputs.modrinth_version }}
+
+          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-tag: ${{ steps.version.outputs.tag }}
+
+          game-version-filter: ${{ steps.version.outputs.game_version_filter }}
+          version-type: ${{ steps.version.outputs.version_type }}
+          name: "Template v${{ steps.version.outputs.version }} for ${{ steps.version.outputs.loader }} ${{ steps.version.outputs.minecraft_version }}"
+          version: "${{ steps.version.outputs.full_version }}"
+
+          files: ${{ matrix.loader }}/build/libs/template-${{ steps.version.outputs.full_version }}.jar
+
+          changelog: ${{ github.event.release.body || format('Release {0}', steps.version.outputs.full_version) }}

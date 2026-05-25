@@ -1,0 +1,83 @@
+// Common subproject — shared domain code, compiles against vanilla MC via Loom.
+// splitEnvironmentSourceSets() creates src/main (server-safe) and src/client (client-only).
+plugins {
+    id 'multiloader-common'
+    id 'net.fabricmc.fabric-loom'
+}
+
+loom {
+    splitEnvironmentSourceSets()
+    // No mods {} block — common is a compilation target, not a runnable mod.
+    accessWidenerPath = file("src/main/resources/template.accesswidener")
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+
+    // fabric-loader and fabric-api are test-only — they initialize the Fabric environment
+    // for fabric-loader-junit. Do NOT add them to the main compile classpath.
+    testImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    testImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}"
+
+    // Optional: Team Reborn Energy API (bundled into the Fabric jar via include in fabric/build.gradle)
+    // implementation("teamreborn:energy:${rootProject.fabric_energy_version}")
+
+    // Test infrastructure
+    testImplementation "org.junit.jupiter:junit-jupiter:${rootProject.junit_version}"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+    testImplementation "org.assertj:assertj-core:${rootProject.assertj_version}"
+
+    // Optional: add fabric-loader-junit when your tests need the Fabric environment
+    // (required for testing code that uses Fabric mixins or Fabric APIs).
+    // Note: this requires Minecraft to be downloaded first (run ./gradlew :fabric:jar once).
+    // testImplementation "net.fabricmc:fabric-loader-junit:${rootProject.fabric_loader_version}"
+    // testImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_version}"
+}
+
+apply plugin: 'jacoco'
+
+sourceSets {
+    test {
+        java { srcDir 'src/test/java' }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = rootProject.java_version.toInteger()
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat = "full"
+        showStandardStreams = false
+    }
+    failFast = false
+    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required = true
+        xml.required = true
+    }
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, include: ['com/example/**'])
+    }))
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+jar {
+    inputs.property "archivesName", project.base.archivesName
+    from("../LICENSE") {
+        rename { "${it}_${inputs.properties.archivesName}" }
+    }
+}

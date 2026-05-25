@@ -1,0 +1,294 @@
+plugins {
+    id 'com.diffplug.spotless'
+}
+
+version = System.getenv("MOD_VERSION") ?: "dev"
+group = project.maven_group
+
+repositories {
+    mavenCentral()
+}
+
+spotless {
+    // Keep this intentionally minimal to avoid churny formatting diffs.
+    java {
+        target 'common/src/**/*.java', 'fabric/src/**/*.java', 'neoforge/src/**/*.java'
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+
+    // Whitespace hygiene for common text files.
+    format('misc') {
+        target '*.gradle', '**/*.gradle', '*.md', '*.yml', '*.yaml', '*.json', '*.properties', '.gitignore'
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
+// Task to install Git hooks for developers
+tasks.register('installGitHooks') {
+    description = 'Install Git hooks for code formatting'
+    group = 'build setup'
+
+    doLast {
+        def hooksDir = file('.githooks')
+
+        // Find the git hooks directory (handles worktrees)
+        def gitDir = file('.git')
+        def gitHooksDir
+
+        if (gitDir.isFile()) {
+            // This is a worktree - read the gitdir path
+            def gitDirPath = gitDir.text.trim().replace('gitdir: ', '')
+            // For worktrees, hooks are in the main repo's .git/hooks
+            def worktreeGitDir = file(gitDirPath)
+            // Navigate up to find the main .git directory
+            def commonDir = new File(worktreeGitDir, 'commondir')
+            if (commonDir.exists()) {
+                def commonPath = commonDir.text.trim()
+                gitHooksDir = file("${worktreeGitDir}/${commonPath}/hooks")
+            } else {
+                gitHooksDir = new File(worktreeGitDir, "hooks")
+            }
+        } else {
+            // Regular git repository
+            gitHooksDir = file('.git/hooks')
+        }
+
+        if (!gitHooksDir.exists()) {
+            gitHooksDir.mkdirs()
+        }
+
+        println "Installing hooks to: ${gitHooksDir}"
+
+        hooksDir.listFiles()?.each { hookFile ->
+            if (hookFile.isFile()) {
+                def targetFile = new File(gitHooksDir, hookFile.name)
+                targetFile.text = hookFile.text
+                targetFile.setExecutable(true)
+                println "  ✓ Installed: ${hookFile.name}"
+            }
+        }
+    }
+}
+
+// Aggregate build: delegates to loader subprojects.
+tasks.named('build') {
+    dependsOn ':fabric:build'
+    dependsOn ':neoforge:build'
+    dependsOn ':common:test'
+}
+
+tasks.named('check') {
+    dependsOn 'spotlessCheck'
+}
+
+// ── Setup Mod ──────────────────────────────────────────────────────────────
+// Renames all template placeholders to your mod's identity in one shot.
+//
+// Usage:
+//   ./gradlew setupMod \
+//     -PmodId=coolmod \
+//     -PpackageName=com.yourname.coolmod \
+//     -PmodDisplayName="Cool Mod" \
+//     -Pdescription="A cool mod for Minecraft" \
+//     -Pauthors="Your Name (@yourhandle)"
+//
+// All parameters except modId and packageName are optional.
+// modDisplayName defaults to a title-cased version of modId (cool_mod → Cool Mod).
+// After running, review the changes with `git diff` and commit.
+// ──────────────────────────────────────────────────────────────────────────
+tasks.register('setupMod') {
+    description = 'Replace template placeholders with your mod identity (run once after cloning)'
+    group = 'setup'
+
+    doLast {
+        // ── Inputs ──────────────────────────────────────────────────────
+        def modId = (project.findProperty('modId') ?: '').toString().trim()
+        def packageName = (project.findProperty('packageName') ?: '').toString().trim()
+        // Note: use 'modDisplayName' not 'displayName' — the latter is a reserved Gradle property.
+        def displayName = (project.findProperty('modDisplayName') ?: toDisplayName(modId)).toString().trim()
+        def description = (project.findProperty('description') ?: 'A Minecraft mod.').toString().trim()
+        def authors = (project.findProperty('authors') ?: 'Your Name (@yourhandle)').toString().trim()
+
+        if (!modId) throw new GradleException("Required: -PmodId=yourmod  (lowercase, no spaces)")
+        if (!packageName) throw new GradleException("Required: -PpackageName=com.yourname.yourmod")
+        if (!modId.matches('[a-z][a-z0-9_]*')) {
+            throw new GradleException("modId must be lowercase letters, digits, and underscores, starting with a letter. Got: '$modId'")
+        }
+        if (!packageName.matches('[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)*')) {
+            throw new GradleException("packageName must be a valid Java package (lowercase, dot-separated). Got: '$packageName'")
+        }
+
+        // ── Derived values ───────────────────────────────────────────────
+        // Class prefix: mod_id → ModId, coolmod → Coolmod
+        def classPrefix = modId.split('[_-]').collect { it.capitalize() }.join('')
+
+        def oldModId = 'template'
+        def oldPkg = 'com.example.template'
+        def oldPkgPath = 'com/example/template'
+        def newPkgPath = packageName.replace('.', '/')
+
+        println ""
+        println "  Mod ID:      $oldModId  →  $modId"
+        println "  Class prefix: Template  →  $classPrefix"
+        println "  Package:     $oldPkg  →  $packageName"
+        println "  Display name: Template  →  $displayName"
+        println "  Description: (updated)"
+        println "  Authors:     (updated)"
+        println ""
+
+        // ── Step 1: Replace text content in all relevant files ───────────
+        def filesToProcess = []
+        ['common', 'fabric', 'neoforge'].each { sub ->
+            fileTree("${sub}/src").each { f -> if (f.isFile()) filesToProcess << f }
+        }
+        [
+            file('gradle.properties'),
+            file('settings.gradle'),
+            file('build.gradle'),
+            file('fabric/build.gradle'),
+            file('common/build.gradle'),
+            file('neoforge/build.gradle'),
+            file('release-please-config.json'),
+            file('CLAUDE.md'),
+            file('README.md'),
+        ].each { f -> if (f.exists()) filesToProcess << f }
+
+        filesToProcess.each { f ->
+            def text = f.text
+            def updated = text
+                .replace(oldPkg, packageName)
+                .replace(oldPkgPath, newPkgPath)
+                .replace("TemplateModFabricClient", "${classPrefix}ModFabricClient")
+                .replace("TemplateModFabric", "${classPrefix}ModFabric")
+                .replace("TemplateModNeoForge", "${classPrefix}ModNeoForge")
+                .replace("TemplateModClient", "${classPrefix}ModClient")
+                .replace("TemplateMod", "${classPrefix}Mod")
+                .replace('"template"', "\"${modId}\"")
+                .replace("template.accesswidener", "${modId}.accesswidener")
+                .replace("template.mixins.json", "${modId}.mixins.json")
+                .replace("template-gametest", "${modId}-gametest")
+                .replace("\"Template\"", "\"${displayName}\"")
+                .replace("'Template'", "'${displayName}'")
+                .replace("A multiloader Minecraft mod template for Fabric and NeoForge.", description)
+                .replace("template-mc26.1", "${modId}-mc26.1")
+                .replace("archives_base_name=template", "archives_base_name=${modId}")
+                .replace("rootProject.name = 'template'", "rootProject.name = '${modId}'")
+                .replace("modId = \"template\"", "modId = \"${modId}\"")
+                .replace("[[dependencies.template]]", "[[dependencies.${modId}]]")
+                .replace("Your Name (@yourhandle)", authors)
+            if (updated != text) {
+                f.text = updated
+            }
+        }
+
+        // ── Step 2: Rename resource files ────────────────────────────────
+        def renameFile = { File from, String toName ->
+            def to = new File(from.parentFile, toName)
+            if (from.exists() && from.name != toName) {
+                from.renameTo(to)
+                println "  Renamed: ${from.name}  →  ${toName}"
+            }
+        }
+
+        renameFile(
+            file("common/src/main/resources/template.accesswidener"),
+            "${modId}.accesswidener"
+        )
+        renameFile(
+            file("common/src/main/resources/template.mixins.json"),
+            "${modId}.mixins.json"
+        )
+
+        // ── Step 3: Rename Java source files (at the OLD path, before directory move) ──
+        def renameJavaFile = { String dir, String from, String to ->
+            def f = file("${dir}/${from}.java")
+            def t = file("${dir}/${to}.java")
+            if (f.exists()) {
+                f.renameTo(t)
+                println "  Renamed: ${from}.java  →  ${to}.java"
+            }
+        }
+
+        renameJavaFile(
+            "common/src/main/java/${oldPkgPath}",
+            "TemplateMod", "${classPrefix}Mod"
+        )
+        renameJavaFile(
+            "common/src/client/java/${oldPkgPath}",
+            "TemplateModClient", "${classPrefix}ModClient"
+        )
+        renameJavaFile(
+            "fabric/src/main/java/${oldPkgPath}/fabric",
+            "TemplateModFabric", "${classPrefix}ModFabric"
+        )
+        renameJavaFile(
+            "fabric/src/client/java/${oldPkgPath}",
+            "TemplateModFabricClient", "${classPrefix}ModFabricClient"
+        )
+        renameJavaFile(
+            "neoforge/src/main/java/${oldPkgPath}/neoforge",
+            "TemplateModNeoForge", "${classPrefix}ModNeoForge"
+        )
+
+        // ── Step 4: Move Java source directories to new package path ──────
+        if (oldPkgPath != newPkgPath) {
+            def moveSources = { String srcRoot ->
+                def oldDir = file("${srcRoot}/${oldPkgPath}")
+                def newDir = file("${srcRoot}/${newPkgPath}")
+                if (oldDir.exists()) {
+                    newDir.mkdirs()
+                    oldDir.listFiles()?.each { f ->
+                        f.renameTo(new File(newDir, f.name))
+                    }
+                    // Clean up empty parent directories
+                    def toDelete = oldDir
+                    while (toDelete != file(srcRoot) && toDelete.list()?.length == 0) {
+                        def parent = toDelete.parentFile
+                        toDelete.delete()
+                        toDelete = parent
+                    }
+                    println "  Moved:   ${srcRoot}/${oldPkgPath}  →  ${srcRoot}/${newPkgPath}"
+                }
+            }
+
+            // Also handle subdirs (fabric, neoforge) inside old package
+            def moveSubdir = { String srcRoot, String sub ->
+                def oldDir = file("${srcRoot}/${oldPkgPath}/${sub}")
+                def newDir = file("${srcRoot}/${newPkgPath}/${sub}")
+                if (oldDir.exists()) {
+                    newDir.mkdirs()
+                    oldDir.listFiles()?.each { f ->
+                        f.renameTo(new File(newDir, f.name))
+                    }
+                    def toDelete = oldDir
+                    while (toDelete != file(srcRoot) && toDelete.list()?.length == 0) {
+                        def parent = toDelete.parentFile
+                        toDelete.delete()
+                        toDelete = parent
+                    }
+                    println "  Moved:   ${srcRoot}/${oldPkgPath}/${sub}  →  ${srcRoot}/${newPkgPath}/${sub}"
+                }
+            }
+
+            moveSubdir('fabric/src/main/java', 'fabric')
+            moveSubdir('neoforge/src/main/java', 'neoforge')
+            moveSources('common/src/main/java')
+            moveSources('common/src/client/java')
+            moveSources('common/src/test/java')
+            moveSources('fabric/src/main/java')
+            moveSources('fabric/src/client/java')
+            moveSources('neoforge/src/main/java')
+        }
+
+        println ""
+        println "Done. Review changes with: git diff"
+        println "Then commit and run: ./gradlew :common:test"
+    }
+}
+
+def toDisplayName(String modId) {
+    modId.split('[_-]').collect { it.capitalize() }.join(' ')
+}

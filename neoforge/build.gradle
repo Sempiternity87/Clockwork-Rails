@@ -1,0 +1,74 @@
+// NeoForge loader subproject.
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev'
+}
+
+version = System.getenv("MOD_VERSION") ?: "dev-neoforge"
+group = rootProject.group
+
+base {
+    archivesName = rootProject.archives_base_name
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(rootProject.java_version.toInteger())
+    withSourcesJar()
+}
+
+neoForge {
+    version = neoforge_version
+    runs {
+        client {
+            client()
+            gameDirectory = project.file('runs/client')
+        }
+        server {
+            server()
+            gameDirectory = project.file('runs/server')
+        }
+    }
+    mods {
+        template {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    testImplementation "org.junit.jupiter:junit-jupiter:${rootProject.junit_version}"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+    testImplementation "org.assertj:assertj-core:${rootProject.assertj_version}"
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat = "full"
+    }
+}
+
+processResources {
+    var expandProps = [
+        'version'                      : version,
+        'minecraft_version'            : minecraft_version,
+        'minecraft_version_range'      : minecraft_version_range,
+        'neoforge_version'             : neoforge_version,
+        'neoforge_loader_version_range': neoforge_loader_version_range,
+    ]
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand expandProps
+    }
+    inputs.properties(expandProps)
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = rootProject.java_version.toInteger()
+}
+
+jar {
+    from('../LICENSE') {
+        rename { "${it}_template" }
+    }
+}

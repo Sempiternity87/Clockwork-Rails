@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "template",
+  "version": "${version}",
+  "name": "Template",
+  "description": "A multiloader Minecraft mod template for Fabric and NeoForge.",
+  "authors": ["Your Name (@yourhandle)"],
+  "contact": {
+    "homepage": "https://github.com/yourname/your-mod",
+    "issues": "https://github.com/yourname/your-mod/issues",
+    "sources": "https://github.com/yourname/your-mod"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.example.template.fabric.TemplateModFabric"],
+    "client": ["com.example.template.TemplateModFabricClient"]
+  },
+  "mixins": ["template.mixins.json"],
+  "accessWidener": "template.accesswidener",
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": ">=${fabric_version}",
+    "java": ">=${java_version}",
+    "minecraft": ">=${minecraft_version}"
+  }
+}

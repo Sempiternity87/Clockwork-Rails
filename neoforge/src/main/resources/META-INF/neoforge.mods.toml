@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="${neoforge_loader_version_range}"
+license="MIT"
+
+[[mods]]
+modId="template"
+version="${version}"
+displayName="Template"
+description='''
+A multiloader Minecraft mod template for Fabric and NeoForge.
+'''
+authors="Your Name (@yourhandle)"
+
+[[dependencies.template]]
+modId="neoforge"
+type="required"
+versionRange="[${neoforge_version},)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.template]]
+modId="minecraft"
+type="required"
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"
