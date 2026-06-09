@@ -2,9 +2,9 @@ package com.sempiternity.clockwork_rails;
 
 import net.fabricmc.api.ClientModInitializer;
 
-public class ClockworkRailModFabricClient implements ClientModInitializer {
+public class ClockworkRailsModFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        ClockworkRailModClient.onInitializeClient();
+        ClockworkRailsModClient.onInitializeClient();
     }
 }

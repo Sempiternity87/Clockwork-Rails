@@ -7,6 +7,6 @@ import org.junit.jupiter.api.Test;
 class ExampleTest {
     @Test
     void placeholderTest() {
-        assertThat(ClockworkRailMod.MOD_ID).isEqualTo("clockwork_rails");
+        assertThat(ClockworkRailsMod.MOD_ID).isEqualTo("clockwork_rails");
     }
 }

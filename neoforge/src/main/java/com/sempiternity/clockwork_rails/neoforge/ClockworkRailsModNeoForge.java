@@ -1,12 +1,12 @@
 package com.sempiternity.clockwork_rails.neoforge;
 
-import com.sempiternity.clockwork_rails.ClockworkRailMod;
+import com.sempiternity.clockwork_rails.ClockworkRailsMod;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 
-@Mod(ClockworkRailMod.MOD_ID)
-public class ClockworkRailModNeoForge {
-    public ClockworkRailModNeoForge(IEventBus modEventBus) {
-        ClockworkRailMod.onInitialize();
+@Mod(ClockworkRailsMod.MOD_ID)
+public class ClockworkRailsModNeoForge {
+    public ClockworkRailsModNeoForge(IEventBus modEventBus) {
+        ClockworkRailsMod.onInitialize();
     }
 }

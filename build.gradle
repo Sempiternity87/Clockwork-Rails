@@ -161,11 +161,11 @@ tasks.register('setupMod') {
             def updated = text
                 .replace(oldPkg, packageName)
                 .replace(oldPkgPath, newPkgPath)
-                .replace("ClockworkRailModFabricClient", "${classPrefix}ModFabricClient")
-                .replace("ClockworkRailModFabric", "${classPrefix}ModFabric")
-                .replace("ClockworkRailModNeoForge", "${classPrefix}ModNeoForge")
-                .replace("ClockworkRailModClient", "${classPrefix}ModClient")
-                .replace("ClockworkRailMod", "${classPrefix}Mod")
+                .replace("ClockworkRailsModFabricClient", "${classPrefix}ModFabricClient")
+                .replace("ClockworkRailsModFabric", "${classPrefix}ModFabric")
+                .replace("ClockworkRailsModNeoForge", "${classPrefix}ModNeoForge")
+                .replace("ClockworkRailsModClient", "${classPrefix}ModClient")
+                .replace("ClockworkRailsMod", "${classPrefix}Mod")
                 .replace('"clockwork_rails"', "\"${modId}\"")
                 .replace("clockwork_rails.accesswidener", "${modId}.accesswidener")
                 .replace("clockwork_rails.mixins.json", "${modId}.mixins.json")
@@ -214,23 +214,23 @@ tasks.register('setupMod') {
 
         renameJavaFile(
             "common/src/main/java/${oldPkgPath}",
-            "ClockworkRailMod", "${classPrefix}Mod"
+            "ClockworkRailsMod", "${classPrefix}Mod"
         )
         renameJavaFile(
             "common/src/client/java/${oldPkgPath}",
-            "ClockworkRailModClient", "${classPrefix}ModClient"
+            "ClockworkRailsModClient", "${classPrefix}ModClient"
         )
         renameJavaFile(
             "fabric/src/main/java/${oldPkgPath}/fabric",
-            "ClockworkRailModFabric", "${classPrefix}ModFabric"
+            "ClockworkRailsModFabric", "${classPrefix}ModFabric"
         )
         renameJavaFile(
             "fabric/src/client/java/${oldPkgPath}",
-            "ClockworkRailModFabricClient", "${classPrefix}ModFabricClient"
+            "ClockworkRailsModFabricClient", "${classPrefix}ModFabricClient"
         )
         renameJavaFile(
             "neoforge/src/main/java/${oldPkgPath}/neoforge",
-            "ClockworkRailModNeoForge", "${classPrefix}ModNeoForge"
+            "ClockworkRailsModNeoForge", "${classPrefix}ModNeoForge"
         )
 
         // ── Step 4: Move Java source directories to new package path ──────

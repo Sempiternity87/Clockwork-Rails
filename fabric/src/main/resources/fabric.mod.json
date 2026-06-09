@@ -13,8 +13,8 @@
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "main": ["com.sempiternity.clockwork_rails.fabric.ClockworkRailModFabric"],
-    "client": ["com.sempiternity.clockwork_rails.ClockworkRailModFabricClient"]
+    "main": ["com.sempiternity.clockwork_rails.fabric.ClockworkRailsModFabric"],
+    "client": ["com.sempiternity.clockwork_rails.ClockworkRailsModFabricClient"]
   },
   "mixins": ["clockwork_rails.mixins.json"],
   "accessWidener": "clockwork_rails.accesswidener",
