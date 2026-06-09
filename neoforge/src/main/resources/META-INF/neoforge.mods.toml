@@ -3,7 +3,7 @@ loaderVersion="${neoforge_loader_version_range}"
 license="MIT"
 
 [[mods]]
-modId="clockwork_rail"
+modId="clockwork_rails"
 version="${version}"
 displayName="Clockwork Rail"
 description='''
@@ -11,14 +11,14 @@ Control minecart rail junctions using Create-inspired rotation, and power mineca
 '''
 authors="Chadd Klaus (@Sempiternity)"
 
-[[dependencies.clockwork_rail]]
+[[dependencies.clockwork_rails]]
 modId="neoforge"
 type="required"
 versionRange="[${neoforge_version},)"
 ordering="NONE"
 side="BOTH"
 
-[[dependencies.clockwork_rail]]
+[[dependencies.clockwork_rails]]
 modId="minecraft"
 type="required"
 versionRange="${minecraft_version_range}"

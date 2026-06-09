@@ -1,6 +1,6 @@
-package com.sempiternity.clockwork_rail.fabric;
+package com.sempiternity.clockwork_rails.fabric;
 
-import com.sempiternity.clockwork_rail.ClockworkRailMod;
+import com.sempiternity.clockwork_rails.ClockworkRailMod;
 import net.fabricmc.api.ModInitializer;
 
 public class ClockworkRailModFabric implements ModInitializer {

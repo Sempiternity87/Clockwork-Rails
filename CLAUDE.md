@@ -24,15 +24,15 @@ This repository uses a multi-version strategy to support different Minecraft rel
 ### Recommended Worktree Setup
 
 For easier cross-version development, set up git worktrees for each mc/* branch in sibling directories:
-- `../your-mod-mc-1.21.1/` - mc/1.21.1 branch worktree
-- `../your-mod-mc-1.21.11/` - mc/1.21.11 branch worktree
-- `../your-mod-mc-26.1/` - mc/26.1 branch worktree
+- `../clockwork-rails-1.21.1/` - mc/1.21.1 branch worktree
+- `../clockwork-rails-1.21.11/` - mc/1.21.11 branch worktree
+- `../clockwork-rails-26.1/` - mc/26.1 branch worktree
 
 **Setting up worktrees:**
 ```bash
 # From the main repo
-git worktree add ../your-mod-mc-1.21.11 mc/1.21.11
-git worktree add ../your-mod-mc-26.1 mc/26.1
+git worktree add ../clockwork-rails-1.21.11 mc/1.21.11
+git worktree add ../clockwork-rails-26.1 mc/26.1
 ```
 
 **Benefits:**

@@ -126,8 +126,8 @@ tasks.register('setupMod') {
         def classPrefix = modId.split('[_-]').collect { it.capitalize() }.join('')
 
         def oldModId = 'template'
-        def oldPkg = 'com.sempiternity.clockwork_rail'
-        def oldPkgPath = 'com/sempiternity/clockwork_rail'
+        def oldPkg = 'com.sempiternity.clockwork_rails'
+        def oldPkgPath = 'com/sempiternity/clockwork_rails'
         def newPkgPath = packageName.replace('.', '/')
 
         println ""
@@ -166,18 +166,18 @@ tasks.register('setupMod') {
                 .replace("ClockworkRailModNeoForge", "${classPrefix}ModNeoForge")
                 .replace("ClockworkRailModClient", "${classPrefix}ModClient")
                 .replace("ClockworkRailMod", "${classPrefix}Mod")
-                .replace('"clockwork_rail"', "\"${modId}\"")
-                .replace("clockwork_rail.accesswidener", "${modId}.accesswidener")
-                .replace("clockwork_rail.mixins.json", "${modId}.mixins.json")
-                .replace("clockwork_rail-gametest", "${modId}-gametest")
+                .replace('"clockwork_rails"', "\"${modId}\"")
+                .replace("clockwork_rails.accesswidener", "${modId}.accesswidener")
+                .replace("clockwork_rails.mixins.json", "${modId}.mixins.json")
+                .replace("clockwork_rails-gametest", "${modId}-gametest")
                 .replace("\"Template\"", "\"${displayName}\"")
                 .replace("'Clockwork Rail'", "'${displayName}'")
                 .replace("Control minecart rail junctions using Create-inspired rotation, and power minecarts using stored Stress from Create.", description)
-                .replace("clockwork_rail-mc26.1", "${modId}-mc26.1")
-                .replace("archives_base_name=clockwork_rail", "archives_base_name=${modId}")
-                .replace("rootProject.name = 'clockwork_rail'", "rootProject.name = '${modId}'")
+                .replace("clockwork_rails-mc26.1", "${modId}-mc26.1")
+                .replace("archives_base_name=clockwork_rails", "archives_base_name=${modId}")
+                .replace("rootProject.name = 'clockwork_rails'", "rootProject.name = '${modId}'")
                 .replace("modId = \"template\"", "modId = \"${modId}\"")
-                .replace("[[dependencies.clockwork_rail]]", "[[dependencies.${modId}]]")
+                .replace("[[dependencies.clockwork_rails]]", "[[dependencies.${modId}]]")
                 .replace("Chadd Klaus (@Sempiternity)", authors)
             if (updated != text) {
                 f.text = updated
@@ -194,11 +194,11 @@ tasks.register('setupMod') {
         }
 
         renameFile(
-            file("common/src/main/resources/clockwork_rail.accesswidener"),
+            file("common/src/main/resources/clockwork_rails.accesswidener"),
             "${modId}.accesswidener"
         )
         renameFile(
-            file("common/src/main/resources/clockwork_rail.mixins.json"),
+            file("common/src/main/resources/clockwork_rails.mixins.json"),
             "${modId}.mixins.json"
         )
 

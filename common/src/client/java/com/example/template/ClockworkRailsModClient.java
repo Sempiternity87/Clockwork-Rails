@@ -1,4 +1,4 @@
-package com.sempiternity.clockwork_rail;
+package com.sempiternity.clockwork_rails;
 
 public class ClockworkRailModClient {
     public static void onInitializeClient() {

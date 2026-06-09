@@ -1,23 +1,23 @@
 {
   "schemaVersion": 1,
-  "id": "clockwork_rail",
+  "id": "clockwork_rails",
   "version": "${version}",
   "name": "Clockwork Rail",
   "description": "Control minecart rail junctions using Create-inspired rotation, and power minecarts using stored Stress from Create.",
   "authors": ["Chadd Klaus (@Sempiternity)"],
   "contact": {
-    "homepage": "https://github.com/yourname/your-mod",
-    "issues": "https://github.com/yourname/your-mod/issues",
-    "sources": "https://github.com/yourname/your-mod"
+    "homepage": "https://github.com/Sempiternity/Clockwork-Rails",
+    "issues": "https://github.com/Sempiternity/Clockwork-Rails/issues",
+    "sources": "https://github.com/Sempiternity/Clockwork-Rails"
   },
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "main": ["com.sempiternity.clockwork_rail.fabric.ClockworkRailModFabric"],
-    "client": ["com.sempiternity.clockwork_rail.ClockworkRailModFabricClient"]
+    "main": ["com.sempiternity.clockwork_rails.fabric.ClockworkRailModFabric"],
+    "client": ["com.sempiternity.clockwork_rails.ClockworkRailModFabricClient"]
   },
-  "mixins": ["clockwork_rail.mixins.json"],
-  "accessWidener": "clockwork_rail.accesswidener",
+  "mixins": ["clockwork_rails.mixins.json"],
+  "accessWidener": "clockwork_rails.accesswidener",
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
     "fabric-api": ">=${fabric_version}",

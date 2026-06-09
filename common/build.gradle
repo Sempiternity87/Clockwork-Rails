@@ -8,7 +8,7 @@ plugins {
 loom {
     splitEnvironmentSourceSets()
     // No mods {} block — common is a compilation target, not a runnable mod.
-    accessWidenerPath = file("src/main/resources/clockwork_rail.accesswidener")
+    accessWidenerPath = file("src/main/resources/clockwork_rails.accesswidener")
 }
 
 dependencies {

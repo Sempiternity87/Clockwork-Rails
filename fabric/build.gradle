@@ -16,10 +16,10 @@ base {
 loom {
     splitEnvironmentSourceSets()
 
-    accessWidenerPath = project(':common').file("src/main/resources/clockwork_rail.accesswidener")
+    accessWidenerPath = project(':common').file("src/main/resources/clockwork_rails.accesswidener")
 
     mods {
-        "clockwork_rail" {
+        "clockwork_rails" {
             sourceSet sourceSets.main
             sourceSet sourceSets.client
         }
@@ -29,7 +29,7 @@ loom {
 fabricApi {
     configureTests {
         createSourceSet = true
-        modId = "clockwork_rail-gametest"
+        modId = "clockwork_rails-gametest"
         enableGameTests = true
         eula = true
     }

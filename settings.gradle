@@ -19,5 +19,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'clockwork_rail'
+rootProject.name = 'clockwork_rails'
 include 'common', 'fabric', 'neoforge'

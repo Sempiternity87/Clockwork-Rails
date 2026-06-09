@@ -1,7 +1,7 @@
 {
   "packages": {
     ".": {
-      "package-name": "clockwork_rail-mc26.1",
+      "package-name": "clockwork_rails-mc26.1",
       "component": "mc26.1",
       "release-type": "simple",
       "include-component-in-tag": true,
