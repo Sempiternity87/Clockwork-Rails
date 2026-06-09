@@ -93,7 +93,7 @@ tasks.named('check') {
 //     -PpackageName=com.yourname.coolmod \
 //     -PmodDisplayName="Cool Mod" \
 //     -Pdescription="A cool mod for Minecraft" \
-//     -Pauthors="Your Name (@yourhandle)"
+//     -Pauthors="Chadd Klaus (@Sempiternity)"
 //
 // All parameters except modId and packageName are optional.
 // modDisplayName defaults to a title-cased version of modId (cool_mod → Cool Mod).
@@ -110,7 +110,7 @@ tasks.register('setupMod') {
         // Note: use 'modDisplayName' not 'displayName' — the latter is a reserved Gradle property.
         def displayName = (project.findProperty('modDisplayName') ?: toDisplayName(modId)).toString().trim()
         def description = (project.findProperty('description') ?: 'A Minecraft mod.').toString().trim()
-        def authors = (project.findProperty('authors') ?: 'Your Name (@yourhandle)').toString().trim()
+        def authors = (project.findProperty('authors') ?: 'Chadd Klaus (@Sempiternity)').toString().trim()
 
         if (!modId) throw new GradleException("Required: -PmodId=yourmod  (lowercase, no spaces)")
         if (!packageName) throw new GradleException("Required: -PpackageName=com.yourname.yourmod")
@@ -126,8 +126,8 @@ tasks.register('setupMod') {
         def classPrefix = modId.split('[_-]').collect { it.capitalize() }.join('')
 
         def oldModId = 'template'
-        def oldPkg = 'com.example.template'
-        def oldPkgPath = 'com/example/template'
+        def oldPkg = 'com.sempiternity.clockwork_rail'
+        def oldPkgPath = 'com/sempiternity/clockwork_rail'
         def newPkgPath = packageName.replace('.', '/')
 
         println ""
@@ -161,24 +161,24 @@ tasks.register('setupMod') {
             def updated = text
                 .replace(oldPkg, packageName)
                 .replace(oldPkgPath, newPkgPath)
-                .replace("TemplateModFabricClient", "${classPrefix}ModFabricClient")
-                .replace("TemplateModFabric", "${classPrefix}ModFabric")
-                .replace("TemplateModNeoForge", "${classPrefix}ModNeoForge")
-                .replace("TemplateModClient", "${classPrefix}ModClient")
-                .replace("TemplateMod", "${classPrefix}Mod")
-                .replace('"template"', "\"${modId}\"")
-                .replace("template.accesswidener", "${modId}.accesswidener")
-                .replace("template.mixins.json", "${modId}.mixins.json")
-                .replace("template-gametest", "${modId}-gametest")
+                .replace("ClockworkRailModFabricClient", "${classPrefix}ModFabricClient")
+                .replace("ClockworkRailModFabric", "${classPrefix}ModFabric")
+                .replace("ClockworkRailModNeoForge", "${classPrefix}ModNeoForge")
+                .replace("ClockworkRailModClient", "${classPrefix}ModClient")
+                .replace("ClockworkRailMod", "${classPrefix}Mod")
+                .replace('"clockwork_rail"', "\"${modId}\"")
+                .replace("clockwork_rail.accesswidener", "${modId}.accesswidener")
+                .replace("clockwork_rail.mixins.json", "${modId}.mixins.json")
+                .replace("clockwork_rail-gametest", "${modId}-gametest")
                 .replace("\"Template\"", "\"${displayName}\"")
-                .replace("'Template'", "'${displayName}'")
-                .replace("A multiloader Minecraft mod template for Fabric and NeoForge.", description)
-                .replace("template-mc26.1", "${modId}-mc26.1")
-                .replace("archives_base_name=template", "archives_base_name=${modId}")
-                .replace("rootProject.name = 'template'", "rootProject.name = '${modId}'")
+                .replace("'Clockwork Rail'", "'${displayName}'")
+                .replace("Control minecart rail junctions using Create-inspired rotation, and power minecarts using stored Stress from Create.", description)
+                .replace("clockwork_rail-mc26.1", "${modId}-mc26.1")
+                .replace("archives_base_name=clockwork_rail", "archives_base_name=${modId}")
+                .replace("rootProject.name = 'clockwork_rail'", "rootProject.name = '${modId}'")
                 .replace("modId = \"template\"", "modId = \"${modId}\"")
-                .replace("[[dependencies.template]]", "[[dependencies.${modId}]]")
-                .replace("Your Name (@yourhandle)", authors)
+                .replace("[[dependencies.clockwork_rail]]", "[[dependencies.${modId}]]")
+                .replace("Chadd Klaus (@Sempiternity)", authors)
             if (updated != text) {
                 f.text = updated
             }
@@ -194,11 +194,11 @@ tasks.register('setupMod') {
         }
 
         renameFile(
-            file("common/src/main/resources/template.accesswidener"),
+            file("common/src/main/resources/clockwork_rail.accesswidener"),
             "${modId}.accesswidener"
         )
         renameFile(
-            file("common/src/main/resources/template.mixins.json"),
+            file("common/src/main/resources/clockwork_rail.mixins.json"),
             "${modId}.mixins.json"
         )
 
@@ -214,23 +214,23 @@ tasks.register('setupMod') {
 
         renameJavaFile(
             "common/src/main/java/${oldPkgPath}",
-            "TemplateMod", "${classPrefix}Mod"
+            "ClockworkRailMod", "${classPrefix}Mod"
         )
         renameJavaFile(
             "common/src/client/java/${oldPkgPath}",
-            "TemplateModClient", "${classPrefix}ModClient"
+            "ClockworkRailModClient", "${classPrefix}ModClient"
         )
         renameJavaFile(
             "fabric/src/main/java/${oldPkgPath}/fabric",
-            "TemplateModFabric", "${classPrefix}ModFabric"
+            "ClockworkRailModFabric", "${classPrefix}ModFabric"
         )
         renameJavaFile(
             "fabric/src/client/java/${oldPkgPath}",
-            "TemplateModFabricClient", "${classPrefix}ModFabricClient"
+            "ClockworkRailModFabricClient", "${classPrefix}ModFabricClient"
         )
         renameJavaFile(
             "neoforge/src/main/java/${oldPkgPath}/neoforge",
-            "TemplateModNeoForge", "${classPrefix}ModNeoForge"
+            "ClockworkRailModNeoForge", "${classPrefix}ModNeoForge"
         )
 
         // ── Step 4: Move Java source directories to new package path ──────

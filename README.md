@@ -40,7 +40,7 @@ Run the setup task to rename all placeholders in one shot:
   -PpackageName=com.yourname.mymod \
   -PmodDisplayName="My Mod" \
   -Pdescription="A mod that does something cool." \
-  -Pauthors="Your Name (@yourhandle)"
+  -Pauthors="Chadd Klaus (@Sempiternity)"
 ```
 
 This renames every file, directory, and text occurrence of the `template` placeholder — Java class names, package paths, mod metadata, Gradle config, everything. Review the changes with `git diff`, then commit.

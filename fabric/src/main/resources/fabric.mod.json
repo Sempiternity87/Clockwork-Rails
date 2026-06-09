@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "template",
+  "id": "clockwork_rail",
   "version": "${version}",
-  "name": "Template",
-  "description": "A multiloader Minecraft mod template for Fabric and NeoForge.",
-  "authors": ["Your Name (@yourhandle)"],
+  "name": "Clockwork Rail",
+  "description": "Control minecart rail junctions using Create-inspired rotation, and power minecarts using stored Stress from Create.",
+  "authors": ["Chadd Klaus (@Sempiternity)"],
   "contact": {
     "homepage": "https://github.com/yourname/your-mod",
     "issues": "https://github.com/yourname/your-mod/issues",
@@ -13,11 +13,11 @@
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
-    "main": ["com.example.template.fabric.TemplateModFabric"],
-    "client": ["com.example.template.TemplateModFabricClient"]
+    "main": ["com.sempiternity.clockwork_rail.fabric.ClockworkRailModFabric"],
+    "client": ["com.sempiternity.clockwork_rail.ClockworkRailModFabricClient"]
   },
-  "mixins": ["template.mixins.json"],
-  "accessWidener": "template.accesswidener",
+  "mixins": ["clockwork_rail.mixins.json"],
+  "accessWidener": "clockwork_rail.accesswidener",
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
     "fabric-api": ">=${fabric_version}",

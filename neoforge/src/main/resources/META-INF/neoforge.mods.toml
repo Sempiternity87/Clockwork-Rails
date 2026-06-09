@@ -3,22 +3,22 @@ loaderVersion="${neoforge_loader_version_range}"
 license="MIT"
 
 [[mods]]
-modId="template"
+modId="clockwork_rail"
 version="${version}"
-displayName="Template"
+displayName="Clockwork Rail"
 description='''
-A multiloader Minecraft mod template for Fabric and NeoForge.
+Control minecart rail junctions using Create-inspired rotation, and power minecarts using stored Stress from Create.
 '''
-authors="Your Name (@yourhandle)"
+authors="Chadd Klaus (@Sempiternity)"
 
-[[dependencies.template]]
+[[dependencies.clockwork_rail]]
 modId="neoforge"
 type="required"
 versionRange="[${neoforge_version},)"
 ordering="NONE"
 side="BOTH"
 
-[[dependencies.template]]
+[[dependencies.clockwork_rail]]
 modId="minecraft"
 type="required"
 versionRange="${minecraft_version_range}"

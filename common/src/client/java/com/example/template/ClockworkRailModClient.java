@@ -1,6 +1,6 @@
-package com.example.template;
+package com.sempiternity.clockwork_rail;
 
-public class TemplateModClient {
+public class ClockworkRailModClient {
     public static void onInitializeClient() {
         // Register block entity renderers, screens, model loaders, etc.
     }
